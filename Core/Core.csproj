@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>GrpcSandbox.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Protos\customers.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.5" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.49.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.49.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\customers.proto" GrpcServices="Server" />
+  </ItemGroup>
+
+</Project>

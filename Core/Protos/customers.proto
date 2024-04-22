@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "GrpcSandbox.Core.Protos";
+
+service CustomerService {
+	rpc GetCustomerInfo (CustomerLookupRequest) returns (Customer);
+	rpc GetNewCustomers (NewCustomerRequest) returns (stream Customer);
+}
+
+message NewCustomerRequest {}
+
+message CustomerLookupRequest {
+	int32 UserId = 1;
+}
+
+message Customer {
+	string FirstName = 1;
+	string LastName = 2;
+	string EmailAddress = 3;
+	bool IsAlive = 4;
+	int32 Age = 5;
+	int32 Id = 6;
+}
