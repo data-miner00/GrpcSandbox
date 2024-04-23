@@ -2,6 +2,8 @@
 
 option csharp_namespace = "GrpcSandbox.Core.Protos";
 
+import "google/protobuf/timestamp.proto";
+
 service CustomerService {
 	rpc GetCustomerInfo (CustomerLookupRequest) returns (Customer);
 	rpc GetNewCustomers (NewCustomerRequest) returns (stream Customer);
@@ -20,4 +22,26 @@ message Customer {
 	bool IsAlive = 4;
 	int32 Age = 5;
 	int32 Id = 6;
+	Address BillingAddress = 7;
+	Address ShippingAddress = 8;
+	repeated string Receipts = 9;
+	Membership Membership = 10;
+	google.protobuf.Timestamp CreatedAt = 11;
+	google.protobuf.Timestamp ModifiedAt = 12;
+}
+
+message Address {
+	string Line1 = 1;
+	string Line2 = 2;
+	string Line3 = 3;
+	string County = 4;
+	string Province = 5;
+	string PostCode = 6;
+	string Country = 7;
+}
+
+enum Membership {
+	Guest = 0;
+	Basic = 1;
+	Premium = 2;
 }

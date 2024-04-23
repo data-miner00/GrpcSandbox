@@ -5,6 +5,11 @@ from customers_pb2_grpc import CustomerServiceStub
 from google.protobuf.timestamp_pb2 import Timestamp
 
 
+def eager_create_timestamp_now() -> Timestamp:
+    now = Timestamp()
+    now.GetCurrentTime()
+    return now
+
 if __name__ == "__main__":
     print("hello from gRPC Python.")
     userId = 2
