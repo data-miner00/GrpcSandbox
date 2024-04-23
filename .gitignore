@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Python Protobuf generated
 *pb2*.py*
+
+# JavaScript Protobuf generated
+*pb*.js

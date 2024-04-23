@@ -1,0 +1,10 @@
+{
+  "name": "grpcsandbox",
+  "version": "1.0.0",
+  "description": "Playing with gRPC.",
+  "keywords": [
+    "gRPC"
+  ],
+  "author": "data-miner00 <data-miner00@users.noreply.github.com>",
+  "license": "LGPL-2.1-or-later"
+}

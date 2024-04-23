@@ -1,0 +1,19 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "JavaScript gRPC sandbox.",
+  "main": "index.js",
+  "scripts": {
+    "generate": "powershell ./Generate-Bindings.ps1"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@grpc/proto-loader": "^0.7.12",
+    "google-protobuf": "^3.21.2",
+    "grpc-web": "^1.5.0"
+  },
+  "devDependencies": {
+    "grpc-tools": "^1.12.4",
+    "protoc-gen-grpc-web": "^1.4.2"
+  }
+}
