@@ -18,4 +18,24 @@ public class DummyService : DummyServiceBase
 
         return new();
     }
+
+    public override async Task BidirectionStreaming(
+        IAsyncStreamReader<DummyRequest> requestStream,
+        IServerStreamWriter<DummyResponse> responseStream,
+        ServerCallContext context)
+    {
+        while (await requestStream.MoveNext())
+        {
+            var current = requestStream.Current;
+            Console.WriteLine(current.Payload);
+
+            if (current.Payload % 5 == 0)
+            {
+                await responseStream.WriteAsync(new DummyResponse
+                {
+                    Response = current.Payload,
+                });
+            }
+        }
+    }
 }

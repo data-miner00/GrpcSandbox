@@ -6,8 +6,13 @@ import "google/protobuf/empty.proto";
 
 service DummyService {
 	rpc AcceptStreaming (stream DummyRequest) returns (google.protobuf.Empty);
+	rpc BidirectionStreaming (stream DummyRequest) returns (stream DummyResponse);
 }
 
 message DummyRequest {
 	int32 Payload = 1;
+}
+
+message DummyResponse {
+	int32 Response = 1;
 }

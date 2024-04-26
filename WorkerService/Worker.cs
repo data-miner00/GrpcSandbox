@@ -58,4 +58,18 @@ public class Worker : BackgroundService
             });
         }
     }
+
+    [Obsolete("Unsafe to call in worker")]
+    private async Task BidirectionStream()
+    {
+        using var stream = this.dummy.BidirectionStreaming();
+
+        for (var i = 0; i < 20; i++)
+        {
+            await stream.RequestStream.WriteAsync(new Core.Protos.DummyRequest
+            {
+                Payload = Random.Shared.Next()
+            });
+        }
+    }
 }
