@@ -31,7 +31,7 @@ public sealed class CustomerRepository
             .RuleFor(x => x.FirstName, s => s.Name.FirstName())
             .RuleFor(x => x.LastName, s => s.Name.LastName())
             .RuleFor(x => x.Age, s => s.Random.Int(20, 80))
-            .RuleFor(x => x.EmailAddress, s => s.Internet.Email())
+            .RuleFor(x => x.EmailAddress, (s, o) => s.Internet.Email(o.FirstName, o.LastName))
             .RuleFor(x => x.Receipts, (s, o) =>
             {
                 o.Receipts

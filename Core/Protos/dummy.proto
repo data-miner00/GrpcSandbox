@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "GrpcSandbox.Core.Protos";
+
+import "google/protobuf/empty.proto";
+
+service DummyService {
+	rpc AcceptStreaming (stream DummyRequest) returns (google.protobuf.Empty);
+}
+
+message DummyRequest {
+	int32 Payload = 1;
+}
