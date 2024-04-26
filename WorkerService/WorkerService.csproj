@@ -22,5 +22,8 @@
     <Protobuf Include="..\Core\Protos\customers.proto" GrpcServices="Client">
       <Link>Protos\customers.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\Core\Protos\dummy.proto" GrpcServices="Client">
+      <Link>Protos\dummy.proto</Link>
+    </Protobuf>
   </ItemGroup>
 </Project>
