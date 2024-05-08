@@ -2,9 +2,12 @@ namespace GrpcSandbox.Server.Services;
 
 using Grpc.Core;
 using GrpcSandbox.Server.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using gCustomerService = GrpcSandbox.Core.Protos.CustomerService;
 
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class CustomerService : gCustomerService.CustomerServiceBase
 {
     private readonly CustomerRepository repository;

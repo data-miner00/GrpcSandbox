@@ -1,5 +1,6 @@
 namespace GrpcSandbox.WorkerService;
 
+using Grpc.Core;
 using Grpc.Net.Client;
 using static GrpcSandbox.Core.Protos.CustomerService;
 using static GrpcSandbox.Core.Protos.DummyService;
@@ -24,18 +25,25 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            if (_logger.IsEnabled(LogLevel.Information))
+            while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                }
+
+                this.LookupCustomer();
+
+                await this.PushStream();
+
+                await Task.Delay(3000, stoppingToken);
             }
-
-            this.LookupCustomer();
-
-            await this.PushStream();
-
-            await Task.Delay(3000, stoppingToken);
+        }
+        catch (RpcException ex)
+        {
+            this._logger.LogError(ex, "Error occurred: {message}", ex.Message);
         }
     }
 
