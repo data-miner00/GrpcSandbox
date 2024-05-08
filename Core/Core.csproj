@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Protos\customers.proto" />
+    <None Remove="Protos\dummy.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,10 +20,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.1.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Protobuf Include="Protos\customers.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\dummy.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

@@ -13,6 +13,9 @@ public class Worker : BackgroundService
     private readonly CustomerServiceClient client;
     private readonly DummyServiceClient dummy;
 
+    private string token = string.Empty;
+    private DateTime expiration = DateTime.MinValue;
+
     public Worker(ILogger<Worker> logger, IConfiguration configuration)
     {
         _logger = logger;
@@ -23,22 +26,36 @@ public class Worker : BackgroundService
         this.dummy = new DummyServiceClient(channel);
     }
 
+    private bool RequiresLogin => string.IsNullOrEmpty(this.token) || this.expiration <= DateTime.Now;
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            while (!stoppingToken.IsCancellationRequested)
+            if (!this.RequiresLogin || await this.RequestToken())
             {
-                if (_logger.IsEnabled(LogLevel.Information))
+                var headers = new Metadata
                 {
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    { "Authorization", $"Bearer {this.token}" },
+                };
+
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    }
+
+                    this.LookupCustomer(headers);
+
+                    await this.PushStream();
+
+                    await Task.Delay(3000, stoppingToken);
                 }
-
-                this.LookupCustomer();
-
-                await this.PushStream();
-
-                await Task.Delay(3000, stoppingToken);
+            }
+            else
+            {
+                this._logger.LogError("Failed to get JWT token");
             }
         }
         catch (RpcException ex)
@@ -47,9 +64,11 @@ public class Worker : BackgroundService
         }
     }
 
-    private void LookupCustomer()
+    private void LookupCustomer(Metadata metadata)
     {
-        var customer = this.client.GetCustomerInfo(new Core.Protos.CustomerLookupRequest { UserId = this.customerId });
+        var customer = this.client.GetCustomerInfo(
+            new Core.Protos.CustomerLookupRequest { UserId = this.customerId },
+            metadata);
 
         Console.WriteLine(customer.FirstName + " " + customer.LastName);
     }
@@ -65,6 +84,32 @@ public class Worker : BackgroundService
                 Payload = Random.Shared.Next()
             });
         }
+    }
+
+    private async Task<bool> RequestToken()
+    {
+        try
+        {
+            var result = await this.client.GenerateTokenAsync(new Core.Protos.TokenRequest
+            {
+                Username = "shaun",
+                Password = "password*",
+            });
+
+            if (result.Success)
+            {
+                this.token = result.Token;
+                this.expiration = result.Expiration.ToDateTime();
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            this._logger.LogError(ex, "Something wrong: {message}", ex.Message);
+        }
+
+        return false;
     }
 
     [Obsolete("Unsafe to call in worker")]

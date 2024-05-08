@@ -3,18 +3,21 @@ using GrpcSandbox.Server.Repositories;
 using GrpcSandbox.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var issuer = builder.Configuration["Jwt:Issuer"] ?? string.Empty;
+var audience = builder.Configuration["Jwt:Audience"] ?? string.Empty;
+var key = builder.Configuration["Jwt:Key"] ?? string.Empty;
 
 // Add services to the container.
 builder.Services
     .AddAuthentication()
     .AddJwtBearer(opt =>
     {
-        var issuer = builder.Configuration["Jwt:Issuer"] ?? string.Empty;
-        var audience = builder.Configuration["Jwt:Audience"] ?? string.Empty;
-        var key = builder.Configuration["Jwt:Key"] ?? string.Empty;
         opt.TokenValidationParameters = new DefaultTokenValidationParameters(issuer, audience, key);
     });
 
+var validator = new JwtTokenValidator(audience, issuer, key);
+
+builder.Services.AddSingleton(validator);
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<CustomerRepository>();

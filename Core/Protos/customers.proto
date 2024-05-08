@@ -7,6 +7,7 @@ import "google/protobuf/timestamp.proto";
 service CustomerService {
 	rpc GetCustomerInfo (CustomerLookupRequest) returns (Customer);
 	rpc GetNewCustomers (NewCustomerRequest) returns (stream Customer);
+	rpc GenerateToken (TokenRequest) returns (TokenResponse);
 }
 
 message NewCustomerRequest {}
@@ -44,4 +45,15 @@ enum Membership {
 	Guest = 0;
 	Basic = 1;
 	Premium = 2;
+}
+
+message TokenRequest {
+	string Username = 1;
+	string Password = 2;
+}
+
+message TokenResponse {
+	bool Success = 1;
+	string Token = 2;
+	google.protobuf.Timestamp Expiration = 3;
 }
