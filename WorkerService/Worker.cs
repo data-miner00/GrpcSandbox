@@ -2,6 +2,7 @@ namespace GrpcSandbox.WorkerService;
 
 using Grpc.Core;
 using Grpc.Net.Client;
+using System.Security.Cryptography.X509Certificates;
 using static GrpcSandbox.Core.Protos.CustomerService;
 using static GrpcSandbox.Core.Protos.DummyService;
 
@@ -23,7 +24,22 @@ public class Worker : BackgroundService
         this.serviceUrl = configuration["ServerUrl"];
         var channel = GrpcChannel.ForAddress(this.serviceUrl);
         this.client = new CustomerServiceClient(channel);
-        this.dummy = new DummyServiceClient(channel);
+
+        var certName = configuration["Certificates:Name"];
+        var certPassword = configuration["Certificates:Password"];
+
+        var cert = new X509Certificate2(certName, certPassword);
+        var handler = new HttpClientHandler();
+        handler.ClientCertificates.Add(cert);
+
+        var httpClient = new HttpClient(handler);
+        var options = new GrpcChannelOptions
+        {
+            HttpClient = httpClient,
+        };
+
+        var certificateChannel = GrpcChannel.ForAddress(this.serviceUrl, options);
+        this.dummy = new DummyServiceClient(certificateChannel);
     }
 
     private bool RequiresLogin => string.IsNullOrEmpty(this.token) || this.expiration <= DateTime.Now;
@@ -50,7 +66,7 @@ public class Worker : BackgroundService
 
                     await this.PushStream();
 
-                    await Task.Delay(3000, stoppingToken);
+                    await Task.Delay(600_000, stoppingToken);
                 }
             }
             else

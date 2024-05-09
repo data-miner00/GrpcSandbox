@@ -3,9 +3,12 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcSandbox.Core.Protos;
+using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using static GrpcSandbox.Core.Protos.DummyService;
 
+[Authorize(AuthenticationSchemes = CertificateAuthenticationDefaults.AuthenticationScheme)]
 public class DummyService : DummyServiceBase
 {
     public override async Task<Empty> AcceptStreaming(IAsyncStreamReader<DummyRequest> requestStream, ServerCallContext context)

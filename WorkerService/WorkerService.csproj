@@ -26,4 +26,10 @@
       <Link>Protos\dummy.proto</Link>
     </Protobuf>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="grpcselfcert.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
