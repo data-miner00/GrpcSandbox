@@ -1,6 +1,6 @@
 # GrpcSandbox
 
-Playing with gRPC.
+Playing with gRPC. Refactoring in progress...
 
 ## References
 
