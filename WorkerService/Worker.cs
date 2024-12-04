@@ -46,7 +46,7 @@ public sealed class Worker : BackgroundService
             HttpClient = httpClient,
         };
 
-        var certificateChannel = GrpcChannel.ForAddress(this.serviceUrl, options);
+        var certificateChannel = GrpcChannel.ForAddress(serviceUrl, options);
         this.dummy = new DummyServiceClient(certificateChannel);
     }
 
