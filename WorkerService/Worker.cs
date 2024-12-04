@@ -2,6 +2,7 @@ namespace GrpcSandbox.WorkerService;
 
 using Grpc.Core;
 using Grpc.Net.Client;
+using GrpcSandbox.Core;
 using System.Security.Cryptography.X509Certificates;
 
 using static GrpcSandbox.Core.Protos.CustomerService;
@@ -27,9 +28,9 @@ public sealed class Worker : BackgroundService
     /// <param name="configuration">The configuration object.</param>
     public Worker(ILogger<Worker> logger, IConfiguration configuration)
     {
-        this.logger = logger;
+        this.logger = Guard.ThrowIfNull(logger);
         this.customerId = configuration.GetValue<int>("CustomerId");
-        var serviceUrl = configuration["ServerUrl"];
+        var serviceUrl = Guard.ThrowIfNullOrWhitespace(configuration["ServerUrl"]);
         var channel = GrpcChannel.ForAddress(serviceUrl);
         this.client = new CustomerServiceClient(channel);
 
