@@ -2,6 +2,7 @@
 
 using Grpc.Net.Client;
 using GrpcSandbox.Core.Protos;
+
 using static GrpcSandbox.Core.Protos.CustomerService;
 
 public static class Program

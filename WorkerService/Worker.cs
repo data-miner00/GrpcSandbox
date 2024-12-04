@@ -3,26 +3,34 @@ namespace GrpcSandbox.WorkerService;
 using Grpc.Core;
 using Grpc.Net.Client;
 using System.Security.Cryptography.X509Certificates;
+
 using static GrpcSandbox.Core.Protos.CustomerService;
 using static GrpcSandbox.Core.Protos.DummyService;
 
-public class Worker : BackgroundService
+/// <summary>
+/// Sample background worker.
+/// </summary>
+public sealed class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<Worker> logger;
     private readonly int customerId;
-    private readonly string serviceUrl;
     private readonly CustomerServiceClient client;
     private readonly DummyServiceClient dummy;
 
     private string token = string.Empty;
     private DateTime expiration = DateTime.MinValue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Worker"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="configuration">The configuration object.</param>
     public Worker(ILogger<Worker> logger, IConfiguration configuration)
     {
-        _logger = logger;
+        this.logger = logger;
         this.customerId = configuration.GetValue<int>("CustomerId");
-        this.serviceUrl = configuration["ServerUrl"];
-        var channel = GrpcChannel.ForAddress(this.serviceUrl);
+        var serviceUrl = configuration["ServerUrl"];
+        var channel = GrpcChannel.ForAddress(serviceUrl);
         this.client = new CustomerServiceClient(channel);
 
         var certName = configuration["Certificates:Name"];
@@ -44,6 +52,7 @@ public class Worker : BackgroundService
 
     private bool RequiresLogin => string.IsNullOrEmpty(this.token) || this.expiration <= DateTime.Now;
 
+    /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
@@ -57,9 +66,9 @@ public class Worker : BackgroundService
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    if (_logger.IsEnabled(LogLevel.Information))
+                    if (this.logger.IsEnabled(LogLevel.Information))
                     {
-                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                        this.logger.LogInformation("Worker running at: {Time}", DateTimeOffset.Now);
                     }
 
                     this.LookupCustomer(headers);
@@ -71,12 +80,12 @@ public class Worker : BackgroundService
             }
             else
             {
-                this._logger.LogError("Failed to get JWT token");
+                this.logger.LogError("Failed to get JWT token");
             }
         }
         catch (RpcException ex)
         {
-            this._logger.LogError(ex, "Error occurred: {message}", ex.Message);
+            this.logger.LogError(ex, "Error occurred: {Message}", ex.Message);
         }
     }
 
@@ -97,7 +106,7 @@ public class Worker : BackgroundService
         {
             await stream.RequestStream.WriteAsync(new Core.Protos.DummyRequest
             {
-                Payload = Random.Shared.Next()
+                Payload = Random.Shared.Next(),
             });
         }
     }
@@ -122,7 +131,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            this._logger.LogError(ex, "Something wrong: {message}", ex.Message);
+            this.logger.LogError(ex, "Something wrong: {Message}", ex.Message);
         }
 
         return false;
@@ -137,7 +146,7 @@ public class Worker : BackgroundService
         {
             await stream.RequestStream.WriteAsync(new Core.Protos.DummyRequest
             {
-                Payload = Random.Shared.Next()
+                Payload = Random.Shared.Next(),
             });
         }
     }

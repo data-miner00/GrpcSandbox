@@ -4,12 +4,16 @@ using System.Linq;
 using Bogus;
 using GrpcSandbox.Core.Protos;
 using Google.Protobuf.WellKnownTypes;
+using GrpcSandbox.Core.Repositories;
 
-public sealed class CustomerRepository
+/// <summary>
+/// A dummy in-memory customer repository.
+/// </summary>
+public sealed class CustomerRepository : ICustomerRepository
 {
-    private readonly Faker<Customer> customerFake;
-    private readonly Faker<Address> addressFake;
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
+    /// </summary>
     public CustomerRepository()
     {
         if (false)
@@ -17,7 +21,7 @@ public sealed class CustomerRepository
             Randomizer.Seed = new Random();
         }
 
-        addressFake = new Faker<Address>()
+        var addressFake = new Faker<Address>()
             .RuleFor(x => x.Line1, s => s.Address.BuildingNumber())
             .RuleFor(x => x.Line2, s => s.Address.StreetAddress())
             .RuleFor(x => x.Line3, s => s.Address.SecondaryAddress())
@@ -26,7 +30,7 @@ public sealed class CustomerRepository
             .RuleFor(x => x.County, s => s.Address.County())
             .RuleFor(x => x.PostCode, s => s.Address.ZipCode());
 
-        customerFake = new Faker<Customer>()
+        var customerFake = new Faker<Customer>()
             .RuleFor(x => x.Id, s => s.IndexFaker)
             .RuleFor(x => x.FirstName, s => s.Name.FirstName())
             .RuleFor(x => x.LastName, s => s.Name.LastName())
@@ -42,25 +46,31 @@ public sealed class CustomerRepository
                 return o.Receipts;
             })
             .RuleFor(x => x.Membership, s => s.PickRandom<Membership>())
-            .RuleFor(x => x.BillingAddress, s => this.addressFake.Generate())
-            .RuleFor(x => x.ShippingAddress, s => this.addressFake.Generate())
+            .RuleFor(x => x.BillingAddress, s => addressFake.Generate())
+            .RuleFor(x => x.ShippingAddress, s => addressFake.Generate())
             .RuleForType(typeof(Timestamp), s => s.Date.Past().ToUniversalTime().ToTimestamp());
 
         this.Customers = customerFake.GenerateBetween(10, 20);
     }
 
+    /// <summary>
+    /// Gets the list of customers.
+    /// </summary>
     public List<Customer> Customers { get; init; }
-        
+
+    /// <inheritdoc/>
     public IEnumerable<Customer> GetAll()
     {
         return this.Customers;
     }
 
+    /// <inheritdoc/>
     public Customer? GetById(int id)
     {
         return this.Customers.SingleOrDefault(x => x.Id == id);
     }
 
+    /// <inheritdoc/>
     public void Edit(Customer customer)
     {
         var found = this.Customers.Find(x => x.Id == customer.Id);
@@ -72,11 +82,13 @@ public sealed class CustomerRepository
         }
     }
 
+    /// <inheritdoc/>
     public void Add(Customer customer)
     {
         this.Customers.Add(customer);
     }
 
+    /// <inheritdoc/>
     public void Delete(int id)
     {
         var found = this.Customers.Find(x => x.Id == id);
